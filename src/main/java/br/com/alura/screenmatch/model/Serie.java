@@ -1,14 +1,24 @@
 package br.com.alura.screenmatch.model;
 
 import com.darkprograms.speech.translator.GoogleTranslate;
+import jakarta.persistence.*;
 
 import java.io.IOException;
 import java.util.OptionalDouble;
 
+@Entity
+@Table(name = "series")
 public class Serie {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(unique = true)
     private String titulo;
     private Integer totalTemporadas;
     private Double avaliacao;
+
+    @Enumerated(EnumType.STRING)
     private Categoria genero;
     private String atores;
     private String poster;
@@ -27,6 +37,14 @@ public class Serie {
         } catch (IOException e) {
             throw new RuntimeException("Falha na tradução");
         }
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getTitulo() {
