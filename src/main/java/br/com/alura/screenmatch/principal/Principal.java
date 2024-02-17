@@ -6,6 +6,8 @@ import br.com.alura.screenmatch.service.ConsumoApi;
 import br.com.alura.screenmatch.service.ConverteDados;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -41,6 +43,7 @@ public class Principal {
                     8 - Filtrar séries
                     9 - Buscar episódios por trecho
                     10 - Top 5 episódios por série
+                    11 - Buscar episódios a partir de uma data
                                     
                     0 - Sair                                
                     """;
@@ -79,6 +82,9 @@ public class Principal {
                     break;
                 case 10:
                     topEpisodiosPorSerie();
+                    break;
+                case 11:
+                    buscarEpisodiosDepoisDeUmaData();
                     break;
                 case 0:
                     System.out.println("Saindo...");
@@ -211,6 +217,32 @@ public class Principal {
                     System.out.printf("Série: %s - Temporada: %s - Episódio: %s - Título Episódio: %s - Avaliação: %s\n",
                             e.getSerie().getTitulo(), e.getTemporada(),
                             e.getNumeroEpisodio(), e.getTitulo(), e.getAvaliacao()));
+        }
+    }
+
+    private void buscarEpisodiosDepoisDeUmaData() {
+        buscarSeriePorTitulo();
+        if (serieBusca.isPresent()) {
+            Serie serie = serieBusca.get();
+            System.out.println("Qual o ano limite de lançamento?");
+            var anoLancamento = leitura.nextInt();
+            leitura.nextLine();
+            List<Episodio> episodiosAno = repositorio.episodiosPorSerieEAno(serie, anoLancamento);
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+            episodiosAno.forEach(e -> {
+                LocalDate dataLancamento = e.getDataLancamento();
+
+                if (dataLancamento != null) {
+                    String dataFormatada = dataLancamento.format(formatter);
+                    System.out.printf("Série: %s - Temporada: %s - Título Episódio: %s - Episódio Nº: %s - Avaliação: %s - Data do Lançamento: %s\n",
+                            e.getSerie().getTitulo(), e.getTemporada(),
+                            e.getTitulo(), e.getNumeroEpisodio(),
+                            e.getAvaliacao(), dataFormatada);
+                } else {
+                    System.out.println("Aviso: Data de lançamento nula para o episódio.");
+                }
+            });
         }
     }
 }
